@@ -9,7 +9,7 @@
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY plgPath   "/boot/config/plugins/&name;">
   <!ENTITY plgName   "&name;-&version;-noarch-1">
-  <!ENTITY MD5       "20c0a1e61244f40b5d095649febec723">
+  <!ENTITY MD5       "3e533fbab5aac93a6d8e79fc501a9f1f">
 ]>
 
 <PLUGIN name="&name;"
