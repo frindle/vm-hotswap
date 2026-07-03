@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "vm-hotswap">
   <!ENTITY author    "penndalton">
-  <!ENTITY version   "2026.07.03">
+  <!ENTITY version   "2026.07.03.1">
   <!ENTITY launch    "Settings/VMHotswap">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/frindle/vm-hotswap/main">
   <!ENTITY relURL    "https://github.com/frindle/vm-hotswap/releases/download/&version;">
@@ -22,7 +22,10 @@
 
 <CHANGES>
 ### &version;
-- Initial scaffold. Cold-swap works. Hot attach/detach in progress. Not for production yet.
+- Move page under Settings → User Utilities (was invisible under Menu="Settings").
+
+### 2026.07.03
+- Initial scaffold. Cold-swap works. CDROM hot change-media. Not for production yet.
 </CHANGES>
 
 <FILE Name="&plgPath;/&plgName;.txz">

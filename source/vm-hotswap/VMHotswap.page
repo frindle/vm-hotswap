@@ -1,5 +1,4 @@
-Menu="Settings"
-Type="xmenu"
+Menu="Utilities"
 Title="VM Hotswap"
 Icon="hdd"
 ---
