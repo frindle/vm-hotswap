@@ -5,6 +5,7 @@
   <!ENTITY version   "2026.07.03">
   <!ENTITY launch    "Settings/VMHotswap">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/frindle/vm-hotswap/main">
+  <!ENTITY relURL    "https://github.com/frindle/vm-hotswap/releases/download/&version;">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY plgPath   "/boot/config/plugins/&name;">
   <!ENTITY plgName   "&name;-&version;-noarch-1">
@@ -25,7 +26,7 @@
 </CHANGES>
 
 <FILE Name="&plgPath;/&plgName;.txz">
-<URL>&gitURL;/archive/&plgName;.txz</URL>
+<URL>&relURL;/&plgName;.txz</URL>
 <MD5>&MD5;</MD5>
 </FILE>
 

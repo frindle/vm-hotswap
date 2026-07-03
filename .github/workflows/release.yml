@@ -1,0 +1,88 @@
+name: Release plugin
+
+# Push a tag matching the version in vm-hotswap.plg (e.g. `2026.07.03`) to
+# build the .txz, attach it to a GitHub Release, and patch the MD5 entity
+# in vm-hotswap.plg back onto main so the .plg on the raw URL is valid.
+#
+# Manual dispatch also works — pick a version, workflow tags + releases it.
+
+on:
+  push:
+    tags:
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so we can commit the MD5 patch back to main
+          # instead of a detached-tag ref.
+          fetch-depth: 0
+          ref: main
+
+      - name: Install xz
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xz-utils
+
+      - name: Extract version
+        id: ver
+        run: |
+          VER=$(sed -n 's/.*<!ENTITY[[:space:]]*version[[:space:]]*"\([^"]*\)".*/\1/p' vm-hotswap.plg)
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "Detected version: $VER"
+          if [ -n "${GITHUB_REF##refs/tags/}" ] && [ "$GITHUB_REF" != "$GITHUB_REF##refs/tags/" ]; then
+            TAG="${GITHUB_REF##refs/tags/}"
+            if [ "$TAG" != "$VER" ]; then
+              echo "::error::Tag $TAG does not match .plg version $VER. Bump the <!ENTITY version> line first."
+              exit 1
+            fi
+          fi
+
+      - name: Build .txz
+        run: |
+          bash scripts/build-package.sh
+          ls -la archive/
+
+      - name: Read MD5
+        id: md5
+        run: |
+          MD5=$(awk '{print $1}' archive/vm-hotswap-${{ steps.ver.outputs.version }}-noarch-1.txz.md5)
+          echo "md5=$MD5" >> "$GITHUB_OUTPUT"
+
+      - name: Create release + attach artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.version }}
+          name: vm-hotswap ${{ steps.ver.outputs.version }}
+          body: |
+            Install by pasting the following URL into **Plugins → Install Plugin** on Unraid:
+
+            ```
+            https://raw.githubusercontent.com/frindle/vm-hotswap/main/vm-hotswap.plg
+            ```
+
+            Or download the `.txz` below and `upgradepkg --install-new` it manually.
+
+            MD5: `${{ steps.md5.outputs.md5 }}`
+          files: |
+            archive/vm-hotswap-${{ steps.ver.outputs.version }}-noarch-1.txz
+            archive/vm-hotswap-${{ steps.ver.outputs.version }}-noarch-1.txz.md5
+
+      - name: Commit patched .plg back to main
+        run: |
+          # build-package.sh already sed'd the MD5 into vm-hotswap.plg —
+          # commit it so Unraid's fetch of the raw .plg validates.
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet vm-hotswap.plg; then
+            echo "No .plg change — MD5 already current."
+            exit 0
+          fi
+          git add vm-hotswap.plg
+          git commit -m "Release ${{ steps.ver.outputs.version }} — update .plg MD5 [skip ci]"
+          git push origin HEAD:main
