@@ -7,11 +7,13 @@ Icon="hdd"
  * VM Hotswap — top-level settings page.
  *
  * Unraid convention: this file's frontmatter tells the emhttp shell how
- * to place it in the nav (Menu=Settings, Type=xmenu, etc.). Everything
- * below the "---" is a normal PHP page rendered inside the Unraid
- * chrome.
+ * to place it in the nav. Everything below the "---" is a normal PHP
+ * page rendered inside the Unraid chrome.
  */
-require_once __DIR__ . '/include/virsh.php';
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
+$_plugin_dir = '/usr/local/emhttp/plugins/vm-hotswap';
+require_once $_plugin_dir . '/include/virsh.php';
 $cfg = vh_settings();
 ?>
 <link rel="stylesheet" href="/plugins/vm-hotswap/css/style.css">
