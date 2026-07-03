@@ -80,6 +80,8 @@
   async function loadDisks(wrap, domain) {
     const tbody = wrap.querySelector('.disks-body');
     tbody.innerHTML = '<tr><td colspan="4">Loading…</td></tr>';
+    const state = wrap.querySelector('.vm-state').textContent.trim();
+    const running = state === 'running';
     let disks;
     try {
       const r = await api('disks', { domain });
@@ -103,14 +105,31 @@
         <td class="actions"></td>
       `;
       const actions = tr.querySelector('.actions');
+
       const detach = document.createElement('button');
       detach.textContent = 'Detach';
       detach.addEventListener('click', () => onDetach(wrap, domain, d.target));
       actions.appendChild(detach);
-      const swap = document.createElement('button');
-      swap.textContent = 'Cold swap…';
-      swap.addEventListener('click', () => onColdSwap(wrap, domain, d.target));
-      actions.appendChild(swap);
+
+      // Swap picks the right operation:
+      //   running + cdrom/floppy → change-media (hot-swap)
+      //   shut off + any disk    → cold XML edit
+      //   running + regular disk → no swap button (would crash the guest)
+      const removable = d.device === 'cdrom' || d.device === 'floppy';
+      if (running && removable) {
+        const swap = document.createElement('button');
+        swap.textContent = 'Change media…';
+        swap.title = 'Swap the ISO / image in this drive while the VM is running.';
+        swap.addEventListener('click', () => onChangeMedia(wrap, domain, d.target));
+        actions.appendChild(swap);
+      } else if (!running) {
+        const swap = document.createElement('button');
+        swap.textContent = 'Cold swap…';
+        swap.title = 'VM is shut off — rewrite the XML to point at a new image.';
+        swap.addEventListener('click', () => onColdSwap(wrap, domain, d.target));
+        actions.appendChild(swap);
+      }
+
       tbody.appendChild(tr);
     }
   }
@@ -138,15 +157,31 @@
     } catch (e) { alert(e.message); }
   }
 
-  async function onColdSwap(wrap, domain, target) {
+  function pickImagePath(wrap, purpose, target) {
     const options = Array.from(wrap.querySelectorAll('.new-source option'))
       .map(o => `${o.textContent}\n  → ${o.value}`).join('\n');
-    const pick = prompt(`Enter FULL PATH of the new source image for ${target}.\n\nAvailable images:\n${options}`);
+    return prompt(
+      `${purpose} for ${target}.\nEnter FULL PATH of the new source image.\n\nAvailable images:\n${options}`
+    );
+  }
+
+  async function onColdSwap(wrap, domain, target) {
+    const pick = pickImagePath(wrap, 'Cold swap (VM shut off)', target);
     if (!pick) return;
     try {
       const r = await api('swap_cold', { domain, target, new_source: pick.trim() }, 'POST');
       if (!r.ok) { alert(r.message); return; }
       loadDisks(wrap, domain);
+    } catch (e) { alert(e.message); }
+  }
+
+  async function onChangeMedia(wrap, domain, target) {
+    const pick = pickImagePath(wrap, 'Change media (running VM)', target);
+    if (!pick) return;
+    try {
+      const r = await api('change_media', { domain, target, new_source: pick.trim() }, 'POST');
+      alert((r.ok ? '✓ ' : '✗ ') + r.message);
+      if (r.ok) loadDisks(wrap, domain);
     } catch (e) { alert(e.message); }
   }
 

@@ -150,9 +150,33 @@ function vh_detach_disk($domain, $target, $live = true) {
     return [true, "detached $target"];
 }
 
+// ── Hot swap ─────────────────────────────────────────────────────────────
+//
+// Scope: swap the ISO / image in a CDROM (or floppy) drive on a running
+// VM. `virsh change-media` handles this cleanly — the emulated drive
+// gets an eject + insert atomically, guest sees new media appear, no
+// filesystem or driver dance required.
+//
+// Regular hard disks are handled by the cold-swap path only (VM shut
+// off, XML rewrite). Hot-plugging a running OS disk would crash the
+// guest, so we don't expose it.
+
+// Change the media in a running CDROM/floppy drive. Atomic eject + insert.
+function vh_change_media($domain, $target, $new_source) {
+    if (!file_exists($new_source)) return [false, "new source not found: $new_source"];
+    vh_backup_xml($domain);
+    // --update replaces current media; --live applies to running domain;
+    // --config persists in XML so it survives a reboot.
+    $cmd = 'virsh change-media ' . vh_arg($domain) . ' ' . vh_arg($target)
+         . ' ' . vh_arg($new_source) . ' --update --live --config';
+    [$rc, $out] = vh_exec($cmd);
+    if ($rc !== 0) return [false, "change-media failed: $out"];
+    return [true, "media swapped on $target → $new_source"];
+}
+
 // Swap the backing file of an existing disk. Cold path only for v0 —
 // requires the domain to be stopped so we can rewrite the XML safely.
-// Hot swap (blockcopy / blockcommit) will land as v1.
+// See vh_swap_disk_hot for the running-VM path.
 function vh_swap_disk_cold($domain, $target, $new_source) {
     [$rc, $state] = vh_exec('virsh domstate ' . vh_arg($domain));
     if (trim($state) !== 'shut off') {

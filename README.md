@@ -8,9 +8,11 @@ Adds a page to the Unraid web UI that lets you:
 
 - **Attach a new disk** to a VM (running or stopped) from a defined images directory
 - **Detach a disk** from a VM
-- **Swap the backing file** of an existing disk — pauses/resumes the VM as needed and rewrites the domain XML with the new file
-- Works on cold (stopped) VMs by editing the domain XML directly
-- Works on running VMs via `virsh attach-disk` / `detach-disk` and QMP-level operations for backing-file swap
+- **Swap the backing file** of an existing disk:
+  - Running VM, CDROM/floppy → `virsh change-media` (hot media eject/insert, safe)
+  - VM shut off, any disk → rewrite the domain XML (safe, atomic on next boot)
+
+Hot-swapping a running VM's regular hard disk is deliberately not supported — pulling the OS disk out from under a live guest crashes it. Shut the VM down first for those.
 
 ## Status
 

@@ -64,6 +64,14 @@ switch ($action) {
         j(['ok' => $ok, 'message' => $msg]);
         break;
 
+    case 'change_media':
+        $domain = $_POST['domain'] ?? '';
+        $target = $_POST['target'] ?? '';
+        $new_source = $_POST['new_source'] ?? '';
+        [$ok, $msg] = vh_change_media($domain, $target, $new_source);
+        j(['ok' => $ok, 'message' => $msg]);
+        break;
+
     case 'save_settings':
         $path = $_POST['IMAGES_PATH'] ?? '';
         $backup = $_POST['BACKUP_XML'] ?? '1';
