@@ -1,0 +1,32 @@
+/* vm-hotswap styles. Intentionally minimal so we inherit Unraid's theme. */
+
+#vmhotswap-root h3 { margin: 0 0 6px 0; display: inline-block; }
+#vmhotswap-root .hint { color: #888; font-size: 0.85em; margin-left: 6px; }
+#vmhotswap-root fieldset { margin: 12px 0; padding: 12px 16px; }
+#vmhotswap-root .row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+#vmhotswap-root .row label { min-width: 200px; }
+#vmhotswap-root .msg { color: #5a5; margin-left: 8px; }
+
+#vmhotswap-root .vm {
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+}
+#vmhotswap-root .vm-state {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 0.8em; margin-left: 8px; text-transform: uppercase;
+  background: #333; color: #ccc;
+}
+#vmhotswap-root .state-running  { background: #2a5; color: #fff; }
+#vmhotswap-root .state-shut-off { background: #555; color: #ccc; }
+#vmhotswap-root .state-paused   { background: #a72; color: #fff; }
+
+#vmhotswap-root table.disks { width: 100%; margin-top: 8px; border-collapse: collapse; }
+#vmhotswap-root table.disks th, #vmhotswap-root table.disks td {
+  text-align: left; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+#vmhotswap-root table.disks .src { font-family: monospace; font-size: 0.85em; word-break: break-all; }
+#vmhotswap-root table.disks .actions button { margin-right: 6px; }
+
+#vmhotswap-root .attach-row { margin-top: 10px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }

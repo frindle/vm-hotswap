@@ -1,0 +1,5 @@
+.DS_Store
+archive/*.txz
+archive/*.md5
+*.swp
+node_modules/

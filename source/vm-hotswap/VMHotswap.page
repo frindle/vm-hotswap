@@ -1,0 +1,76 @@
+Menu="Settings"
+Type="xmenu"
+Title="VM Hotswap"
+Icon="hdd"
+---
+<?PHP
+/*
+ * VM Hotswap — top-level settings page.
+ *
+ * Unraid convention: this file's frontmatter tells the emhttp shell how
+ * to place it in the nav (Menu=Settings, Type=xmenu, etc.). Everything
+ * below the "---" is a normal PHP page rendered inside the Unraid
+ * chrome.
+ */
+require_once __DIR__ . '/include/virsh.php';
+$cfg = vh_settings();
+?>
+<link rel="stylesheet" href="/plugins/vm-hotswap/css/style.css">
+
+<div id="vmhotswap-root">
+  <h2>VM Hotswap</h2>
+  <p class="hint">
+    Attach, detach, or cold-swap disk images on your Unraid VMs. Images are
+    listed from the source path configured below.
+  </p>
+
+  <fieldset>
+    <legend>Configuration</legend>
+    <div class="row">
+      <label>Source images path</label>
+      <input id="cfg-images" type="text" value="<?=htmlspecialchars($cfg['IMAGES_PATH'])?>" size="40">
+      <span class="hint">(cfg reload after save)</span>
+    </div>
+    <div class="row">
+      <label>Back up XML on every change</label>
+      <input id="cfg-backup" type="checkbox" <?= !empty($cfg['BACKUP_XML']) && $cfg['BACKUP_XML'] !== '0' ? 'checked' : '' ?>>
+      <span class="hint">saved to /boot/config/plugins/vm-hotswap/backup/</span>
+    </div>
+    <div class="row">
+      <button id="save-cfg" type="button">Save</button>
+      <span id="save-cfg-msg" class="msg"></span>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Virtual Machines</legend>
+    <div id="vms-loading">Loading…</div>
+    <div id="vms"></div>
+  </fieldset>
+
+  <template id="tpl-vm">
+    <div class="vm">
+      <h3 class="vm-name"></h3>
+      <span class="vm-state"></span>
+      <table class="disks">
+        <thead>
+          <tr>
+            <th>Target</th>
+            <th>Device</th>
+            <th>Source</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class="disks-body"></tbody>
+      </table>
+      <div class="attach-row">
+        <select class="new-source"></select>
+        <input type="text" class="new-target" placeholder="target (e.g. vdb)" size="8">
+        <button type="button" class="attach">Attach</button>
+        <span class="msg"></span>
+      </div>
+    </div>
+  </template>
+</div>
+
+<script src="/plugins/vm-hotswap/js/vm-hotswap.js"></script>
