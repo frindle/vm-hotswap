@@ -1,6 +1,6 @@
 Menu="Utilities"
 Title="VM Hotswap"
-Icon="hdd"
+Icon="icon.svg"
 ---
 <?PHP
 /*

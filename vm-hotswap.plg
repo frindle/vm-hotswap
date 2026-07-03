@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "vm-hotswap">
   <!ENTITY author    "penndalton">
-  <!ENTITY version   "2026.07.03.4">
+  <!ENTITY version   "2026.07.03.5">
   <!ENTITY launch    "Utilities/VMHotswap">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/frindle/vm-hotswap/main">
   <!ENTITY relURL    "https://github.com/frindle/vm-hotswap/releases/download/&version;">
@@ -22,6 +22,9 @@
 
 <CHANGES>
 ### &version;
+- Ship an SVG icon (was rendering blank on Tools tile).
+
+### 2026.07.03.4
 - Label the two attach fields (Image, Target device) so it's obvious what they do.
 - Use Unraid's built-in file browser (openFileBrowser) for picking ISO paths.
 
