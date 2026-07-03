@@ -65,8 +65,13 @@ $cfg = vh_settings();
         <tbody class="disks-body"></tbody>
       </table>
       <div class="attach-row">
-        <select class="new-source"></select>
-        <input type="text" class="new-target" placeholder="target (e.g. vdb)" size="8">
+        <strong>Attach new disk:</strong>
+        <label>Image
+          <select class="new-source"></select>
+        </label>
+        <label>Target device
+          <input type="text" class="new-target" placeholder="e.g. vdb, hdd" size="8">
+        </label>
         <button type="button" class="attach">Attach</button>
         <span class="msg"></span>
       </div>

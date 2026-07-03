@@ -157,16 +157,42 @@
     } catch (e) { alert(e.message); }
   }
 
+  // Open Unraid's built-in filetree picker if available, otherwise fall
+  // back to a browser prompt() listing the pre-scanned images. Returns a
+  // Promise that resolves to the chosen path (or null on cancel).
   function pickImagePath(wrap, purpose, target) {
-    const options = Array.from(wrap.querySelectorAll('.new-source option'))
-      .map(o => `${o.textContent}\n  → ${o.value}`).join('\n');
-    return prompt(
-      `${purpose} for ${target}.\nEnter FULL PATH of the new source image.\n\nAvailable images:\n${options}`
-    );
+    return new Promise((resolve) => {
+      // Unraid's openFileBrowser lives on window (loaded by dynamix.js on
+      // every emhttp page). Signature varies by version; the common form:
+      //   openFileBrowser(triggerEl, root, filter, foldersOnly, onSelect)
+      // where onSelect(pickedPath) is called on double-click.
+      if (typeof window.openFileBrowser === 'function') {
+        // Anchor to a temp element in the DOM so the popup positions.
+        const anchor = document.createElement('span');
+        anchor.style.display = 'none';
+        wrap.appendChild(anchor);
+        const cfgPath = document.getElementById('cfg-images').value.trim() || '/mnt/user/';
+        try {
+          window.openFileBrowser(anchor, cfgPath, /\.(iso|img|qcow2|raw|vhd|vhdx|vmdk)$/i, false, (path) => {
+            anchor.remove();
+            resolve(path || null);
+          });
+          return;
+        } catch (e) {
+          anchor.remove();
+          // Fall through to prompt fallback.
+        }
+      }
+      const options = Array.from(wrap.querySelectorAll('.new-source option'))
+        .map(o => `${o.textContent}\n  → ${o.value}`).join('\n');
+      resolve(prompt(
+        `${purpose} for ${target}.\nEnter FULL PATH of the new source image.\n\nAvailable images:\n${options}`
+      ));
+    });
   }
 
   async function onColdSwap(wrap, domain, target) {
-    const pick = pickImagePath(wrap, 'Cold swap (VM shut off)', target);
+    const pick = await pickImagePath(wrap, 'Cold swap (VM shut off)', target);
     if (!pick) return;
     try {
       const r = await api('swap_cold', { domain, target, new_source: pick.trim() }, 'POST');
@@ -176,7 +202,7 @@
   }
 
   async function onChangeMedia(wrap, domain, target) {
-    const pick = pickImagePath(wrap, 'Change media (running VM)', target);
+    const pick = await pickImagePath(wrap, 'Change media (running VM)', target);
     if (!pick) return;
     try {
       const r = await api('change_media', { domain, target, new_source: pick.trim() }, 'POST');

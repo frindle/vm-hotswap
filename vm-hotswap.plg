@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "vm-hotswap">
   <!ENTITY author    "penndalton">
-  <!ENTITY version   "2026.07.03.3">
+  <!ENTITY version   "2026.07.03.4">
   <!ENTITY launch    "Utilities/VMHotswap">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/frindle/vm-hotswap/main">
   <!ENTITY relURL    "https://github.com/frindle/vm-hotswap/releases/download/&version;">
@@ -22,6 +22,13 @@
 
 <CHANGES>
 ### &version;
+- Label the two attach fields (Image, Target device) so it's obvious what they do.
+- Use Unraid's built-in file browser (openFileBrowser) for picking ISO paths.
+
+### 2026.07.03.3
+- Fix installer — upgradepkg was never running, so the .txz landed on flash but never deployed.
+
+### 2026.07.03.2
 - Fix launch URL to match Menu="Utilities" (Utilities/VMHotswap, not Settings/VMHotswap).
 - Surface PHP errors on the page so blank renders can be diagnosed.
 
