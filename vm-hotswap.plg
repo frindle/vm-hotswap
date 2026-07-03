@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "vm-hotswap">
   <!ENTITY author    "penndalton">
-  <!ENTITY version   "2026.07.03.2">
+  <!ENTITY version   "2026.07.03.3">
   <!ENTITY launch    "Utilities/VMHotswap">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/frindle/vm-hotswap/main">
   <!ENTITY relURL    "https://github.com/frindle/vm-hotswap/releases/download/&version;">
@@ -37,12 +37,13 @@
 <MD5>&MD5;</MD5>
 </FILE>
 
-<FILE Run="/usr/bin/upgradepkg" Method="install">
-<CMD>--install-new &plgPath;/&plgName;.txz</CMD>
-</FILE>
-
 <FILE Run="/bin/bash" Method="install">
 <INLINE>
+# Actually install the Slackware package. Doing this from an inline
+# script instead of a separate FILE Run="upgradepkg" block because
+# the standalone form doesn't reliably execute on modern Unraid.
+upgradepkg --install-new &plgPath;/&plgName;.txz
+
 mkdir -p &plgPath;/backup
 [ ! -f &plgPath;/settings.cfg ] &amp;&amp; cat &gt; &plgPath;/settings.cfg &lt;&lt;'CFG'
 IMAGES_PATH="/mnt/user/isos/vm-disks/"
@@ -52,7 +53,7 @@ CFG
 echo ""
 echo "----------------------------------------------------"
 echo " vm-hotswap &version; installed"
-echo " Settings: Main → Settings → VM Hotswap"
+echo " Open: Tools → VM Hotswap"
 echo "----------------------------------------------------"
 echo ""
 </INLINE>
