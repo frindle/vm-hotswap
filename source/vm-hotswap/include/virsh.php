@@ -25,7 +25,7 @@ function vh_settings() {
     static $cache = null;
     if ($cache !== null) return $cache;
     $cfg_path = '/boot/config/plugins/vm-hotswap/settings.cfg';
-    $cache = ['IMAGES_PATH' => '/mnt/user/isos/vm-disks/', 'BACKUP_XML' => '1'];
+    $cache = ['IMAGES_PATH' => '/mnt/user/isos/', 'BACKUP_XML' => '1'];
     if (!file_exists($cfg_path)) return $cache;
     foreach (file($cfg_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
         if (preg_match('/^([A-Z_]+)="?([^"]*)"?$/', trim($line), $m)) {
@@ -77,7 +77,7 @@ function vh_list_images() {
     $cfg = vh_settings();
     $dir = rtrim($cfg['IMAGES_PATH'], '/') . '/';
     if (!is_dir($dir)) return [false, "images path not found: $dir"];
-    $exts = ['img', 'qcow2', 'raw', 'vhd', 'vhdx', 'vmdk'];
+    $exts = ['iso', 'img', 'qcow2', 'raw', 'vhd', 'vhdx', 'vmdk'];
     $images = [];
     foreach (scandir($dir) as $f) {
         if ($f === '.' || $f === '..') continue;

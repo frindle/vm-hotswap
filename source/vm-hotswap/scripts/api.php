@@ -80,6 +80,7 @@ switch ($action) {
             j(['ok' => false, 'error' => "images path not a directory: $path"]);
         }
         $cfg = "IMAGES_PATH=\"$path\"\nBACKUP_XML=\"$backup\"\n";
+        @mkdir('/boot/config/plugins/vm-hotswap', 0755, true);
         $ok = file_put_contents('/boot/config/plugins/vm-hotswap/settings.cfg', $cfg) !== false;
         j(['ok' => $ok, 'error' => $ok ? null : 'write failed']);
         break;

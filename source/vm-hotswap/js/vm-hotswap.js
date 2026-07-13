@@ -25,7 +25,10 @@
     }
     const res = await fetch(url.toString(), { method, body });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    const text = await res.text();
+    if (!text) throw new Error('empty response from server');
+    try { return JSON.parse(text); }
+    catch { throw new Error('bad JSON from server: ' + text.slice(0, 200)); }
   }
 
   async function renderVMs() {

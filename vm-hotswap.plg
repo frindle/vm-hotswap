@@ -59,7 +59,7 @@ upgradepkg --install-new &plgPath;/&plgName;.txz
 
 mkdir -p &plgPath;/backup
 [ ! -f &plgPath;/settings.cfg ] &amp;&amp; cat &gt; &plgPath;/settings.cfg &lt;&lt;'CFG'
-IMAGES_PATH="/mnt/user/isos/vm-disks/"
+IMAGES_PATH="/mnt/user/isos/"
 BACKUP_XML=1
 CFG
 
